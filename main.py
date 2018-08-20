@@ -65,7 +65,7 @@ def get_accuracy_scores(edges_pos, edges_neg, edge_type):
     preds_all = np.hstack([preds, preds_neg])
     preds_all = np.nan_to_num(preds_all)
     labels_all = np.hstack([np.ones(len(preds)), np.zeros(len(preds_neg))])
-    predicted = zip(*sorted(predicted, reverse=True, key=itemgetter(0)))[1]
+    predicted = list(zip(*sorted(predicted, reverse=True, key=itemgetter(0))))[1]
 
     roc_score = metrics.roc_auc_score(labels_all, preds_all)
     aupr_score = metrics.average_precision_score(labels_all, preds_all)
