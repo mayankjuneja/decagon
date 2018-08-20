@@ -2,7 +2,7 @@ from collections import defaultdict
 
 import tensorflow as tf
 
-from layers import GraphConvolutionMulti, GraphConvolutionSparseMulti, \
+from .layers import GraphConvolutionMulti, GraphConvolutionSparseMulti, \
     DistMultDecoder, InnerProductDecoder, DEDICOMDecoder, BilinearDecoder
 
 flags = tf.app.flags
@@ -12,10 +12,10 @@ FLAGS = flags.FLAGS
 class Model(object):
     def __init__(self, **kwargs):
         allowed_kwargs = {'name', 'logging'}
-        for kwarg in kwargs.keys():
+        for kwarg in list(kwargs.keys()):
             assert kwarg in allowed_kwargs, 'Invalid keyword argument: ' + kwarg
 
-        for kwarg in kwargs.keys():
+        for kwarg in list(kwargs.keys()):
             assert kwarg in allowed_kwargs, 'Invalid keyword argument: ' + kwarg
         name = kwargs.get('name')
         if not name:
@@ -59,7 +59,7 @@ class DecagonModel(Model):
         self.dropout = placeholders['dropout']
         self.adj_mats = {et: [
             placeholders['adj_mats_%d,%d,%d' % (et[0], et[1], k)] for k in range(n)]
-            for et, n in self.edge_types.items()}
+            for et, n in list(self.edge_types.items())}
         self.build()
 
     def _build(self):
@@ -72,7 +72,7 @@ class DecagonModel(Model):
                 act=lambda x: x, dropout=self.dropout,
                 logging=self.logging)(self.inputs[j]))
 
-        for i, hid1 in self.hidden1.iteritems():
+        for i, hid1 in self.hidden1.items():
             self.hidden1[i] = tf.nn.relu(tf.add_n(hid1))
 
         self.embeddings = defaultdict(list)
@@ -83,7 +83,7 @@ class DecagonModel(Model):
                 adj_mats=self.adj_mats, act=lambda x: x,
                 dropout=self.dropout, logging=self.logging)(self.hidden1[j]))
 
-        for i, embeds in self.embeddings.iteritems():
+        for i, embeds in self.embeddings.items():
             # self.embeddings[i] = tf.nn.relu(tf.add_n(embeds))
             self.embeddings[i] = tf.add_n(embeds)
 

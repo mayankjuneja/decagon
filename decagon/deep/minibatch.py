@@ -1,4 +1,4 @@
-from __future__ import division
+
 
 import numpy as np
 import scipy.sparse as sp
@@ -37,22 +37,22 @@ class EdgeMinibatchIterator(object):
                 self.idx2edge_type[r] = i, j, k
                 r += 1
 
-        self.train_edges = {edge_type: [None]*n for edge_type, n in self.edge_types.items()}
-        self.val_edges = {edge_type: [None]*n for edge_type, n in self.edge_types.items()}
-        self.test_edges = {edge_type: [None]*n for edge_type, n in self.edge_types.items()}
-        self.test_edges_false = {edge_type: [None]*n for edge_type, n in self.edge_types.items()}
-        self.val_edges_false = {edge_type: [None]*n for edge_type, n in self.edge_types.items()}
+        self.train_edges = {edge_type: [None]*n for edge_type, n in list(self.edge_types.items())}
+        self.val_edges = {edge_type: [None]*n for edge_type, n in list(self.edge_types.items())}
+        self.test_edges = {edge_type: [None]*n for edge_type, n in list(self.edge_types.items())}
+        self.test_edges_false = {edge_type: [None]*n for edge_type, n in list(self.edge_types.items())}
+        self.val_edges_false = {edge_type: [None]*n for edge_type, n in list(self.edge_types.items())}
 
         # Function to build test and val sets with val_test_size positive links
-        self.adj_train = {edge_type: [None]*n for edge_type, n in self.edge_types.items()}
+        self.adj_train = {edge_type: [None]*n for edge_type, n in list(self.edge_types.items())}
         for i, j in self.edge_types:
             for k in range(self.edge_types[i,j]):
-                print 'Minibatch edge type: (%d, %d, %d)' % (i, j, k)
+                print('Minibatch edge type: (%d, %d, %d)' % (i, j, k))
                 self.mask_test_edges((i, j), k, self.directed[i,j][k])
 
-                print 'Train edges %d: %d' % (i, len(self.train_edges[i,j][k]))
-                print 'Val edges %d: %d' % (i, len(self.val_edges[i,j][k]))
-                print 'Test edges %d: %d' % (i, len(self.test_edges[i,j][k]))
+                print('Train edges %d: %d' % (i, len(self.train_edges[i,j][k])))
+                print('Val edges %d: %d' % (i, len(self.val_edges[i,j][k])))
+                print('Test edges %d: %d' % (i, len(self.test_edges[i,j][k])))
 
     def preprocess_graph(self, adj):
         adj = sp.coo_matrix(adj)
@@ -81,7 +81,7 @@ class EdgeMinibatchIterator(object):
         num_test = max(50, int(np.floor(edges_all.shape[0] * self.val_test_size)))
         num_val = max(50, int(np.floor(edges_all.shape[0] * self.val_test_size)))
 
-        all_edge_idx = range(edges_all.shape[0])
+        all_edge_idx = list(range(edges_all.shape[0]))
         np.random.shuffle(all_edge_idx)
 
         val_edge_idx = all_edge_idx[:num_val]
@@ -108,7 +108,7 @@ class EdgeMinibatchIterator(object):
         test_edges_false = []
         while len(test_edges_false) < len(test_edges):
             if len(test_edges_false) % 1000 == 0:
-                print 'Constructing test edges: %d/%d' % (len(test_edges_false), len(test_edges))
+                print('Constructing test edges: %d/%d' % (len(test_edges_false), len(test_edges)))
             idx_i = np.random.randint(0, self.adj_mats[edge_type][type_idx].shape[0])
             idx_j = np.random.randint(0, self.adj_mats[edge_type][type_idx].shape[1])
             if self._ismember([idx_i, idx_j], edges_all):
@@ -121,7 +121,7 @@ class EdgeMinibatchIterator(object):
         val_edges_false = []
         while len(val_edges_false) < len(val_edges):
             if len(val_edges_false) % 1000 == 0:
-                print 'Constructing val edges: %d/%d' % (len(val_edges_false), len(val_edges))
+                print('Constructing val edges: %d/%d' % (len(val_edges_false), len(val_edges)))
             idx_i = np.random.randint(0, self.adj_mats[edge_type][type_idx].shape[0])
             idx_j = np.random.randint(0, self.adj_mats[edge_type][type_idx].shape[1])
             if self._ismember([idx_i, idx_j], edges_all):

@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from inits import *
+from .inits import *
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
@@ -46,7 +46,7 @@ class MultiLayer(object):
         self.edge_type = edge_type
         self.num_types = num_types
         allowed_kwargs = {'name', 'logging'}
-        for kwarg in kwargs.keys():
+        for kwarg in list(kwargs.keys()):
             assert kwarg in allowed_kwargs, 'Invalid keyword argument: ' + kwarg
         name = kwargs.get('name')
         if not name:

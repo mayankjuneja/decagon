@@ -167,7 +167,7 @@ feat = {
     1: drug_feat,
 }
 
-edge_type2dim = {k: [adj.shape for adj in adjs] for k, adjs in adj_mats_orig.iteritems()}
+edge_type2dim = {k: [adj.shape for adj in adjs] for k, adjs in adj_mats_orig.items()}
 edge_type2directed = {
     (0,0): [False],
     (0,1): [True],
@@ -181,9 +181,9 @@ edge_type2decoder = {
     (1,1): 'dedicom',
 }
 
-edge_types = {k: len(v) for k, v in adj_mats_orig.iteritems()}
+edge_types = {k: len(v) for k, v in adj_mats_orig.items()}
 num_edge_types = sum(edge_types.values())
-print 'Edge types: %d' % num_edge_types
+print('Edge types: %d' % num_edge_types)
 
 ###########################################################
 #
@@ -204,7 +204,7 @@ flags.DEFINE_float('max_margin', 0.1, 'Max margin parameter in hinge loss')
 flags.DEFINE_integer('batch_size', 512, 'minibatch size.')
 flags.DEFINE_boolean('bias', True, 'Bias term.')
 
-print 'Defining placeholders'
+print('Defining placeholders')
 placeholders = construct_placeholders(edge_types)
 
 ###########################################################
@@ -213,7 +213,7 @@ placeholders = construct_placeholders(edge_types)
 #
 ###########################################################
 
-print 'Create minibatch iterator'
+print('Create minibatch iterator')
 minibatch = EdgeMinibatchIterator(
     adj_mats=adj_mats_orig,
     feat=feat,
@@ -223,7 +223,7 @@ minibatch = EdgeMinibatchIterator(
     val_test_size=val_test_size
 )
 
-print 'Create model'
+print('Create model')
 model = DecagonModel(
     placeholders=placeholders,
     num_feat=num_feat,
@@ -232,7 +232,7 @@ model = DecagonModel(
     decoders=edge_type2decoder,
 )
 
-print 'Create optimizer'
+print('Create optimizer')
 with tf.name_scope('optimizer'):
     opt = DecagonOptimizer(
         row_embeds=model.row_embeds,
@@ -247,7 +247,7 @@ with tf.name_scope('optimizer'):
         margin=FLAGS.max_margin
     )
 
-print 'Initialize session'
+print('Initialize session')
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 feed_dict = {}
@@ -258,7 +258,7 @@ feed_dict = {}
 #
 ###########################################################
 
-print 'Train model'
+print('Train model')
 print_every = 1
 for epoch in range(FLAGS.epochs):
 
@@ -284,19 +284,19 @@ for epoch in range(FLAGS.epochs):
                 minibatch.val_edges, minibatch.val_edges_false,
                 minibatch.idx2edge_type[minibatch.current_edge_type_idx])
 
-            print 'Epoch: %04d Iter: %04d Edge: %04d train_loss=%-15.3f ' \
+            print('Epoch: %04d Iter: %04d Edge: %04d train_loss=%-15.3f ' \
                   'val_roc=%.5f val_auprc=%.5f val_apk=%.5f time=%.5f' % (
                 epoch + 1, itr + 1, batch_edge_type, train_cost,
-                val_auc, val_auprc, val_apk, time.time() - t)
+                val_auc, val_auprc, val_apk, time.time() - t))
 
         itr += 1
 
-print 'Optimization finished!'
+print('Optimization finished!')
 
 for et in range(num_edge_types):
     roc_score, auprc_score, apk_score = get_accuracy_scores(
         minibatch.test_edges, minibatch.test_edges_false, minibatch.idx2edge_type[et])
-    print 'Test AUROC score %d: %5.3f' % (et, roc_score)
-    print 'Test AUPRC score %d: %5.3f' % (et, auprc_score)
-    print 'Test AP@k score %d: %5.3f' % (et, apk_score)
-    print
+    print('Test AUROC score %d: %5.3f' % (et, roc_score))
+    print('Test AUPRC score %d: %5.3f' % (et, auprc_score))
+    print('Test AP@k score %d: %5.3f' % (et, apk_score))
+    print()
